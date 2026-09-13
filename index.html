@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio Virtual - Renato Therion</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* ================= ESTILOS GERAIS ================= */
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: #121212; 
+            color: #ffffff; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            margin-bottom: 30px;
+        }
+
+        /* ================= CONTROLES ================= */
+        .painel-controles {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .select-principal {
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            background: #2a2a2a; 
+            color: #fff; 
+            border: 1px solid #FFD700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .linha-acao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bloco-icone {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-icone {
+            background: transparent;
+            border: none;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-icone:hover { transform: scale(1.1); }
+
+        .select-flutuante {
+            display: none;
+            position: absolute;
+            top: 100%;
+            margin-top: 10px;
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #FFD700;
+            padding: 8px;
+            border-radius: 5px;
+            z-index: 20;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .select-flutuante.ativo { display: block; }
+
+        button#btn-sortear {
+            background: #FFD700;
+            color: #121212;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            flex-grow: 1;
+        }
+        button#btn-sortear:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6); }
+        button#btn-sortear:disabled { background: #444; color: #777; cursor: not-allowed; box-shadow: none; border: 1px solid #555; }
+
+        /* ================= GRID DE NÚMEROS ================= */
+        .grid-numeros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 40px;
+        }
+
+        .numero-box {
+            background: #222;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.1s ease;
+            position: relative;
+        }
+
+        .numero-box.cursor { background: #FFD700; color: #121212; border-color: #fff; transform: scale(1.2); box-shadow: 0 0 20px #FFD700; z-index: 10; }
+        .numero-box.sorteado { opacity: 0.3; background: #111; border-color: #222; text-decoration: line-through; color: #666; pointer-events: none; }
+        .numero-box.vencedor { background: #22c55e; color: #fff; border-color: #fff; box-shadow: 0 0 30px #22c55e; animation: pulsoVerde 1s infinite alternate; z-index: 5; opacity: 1; text-decoration: none; }
+
+        @keyframes pulsoVerde {
+            from { transform: scale(1); box-shadow: 0 0 20px #22c55e; }
+            to { transform: scale(1.15); box-shadow: 0 0 40px #22c55e, 0 0 60px #22c55e; }
+        }
+
+        /* ================= ÁREA DO RESULTADO ================= */
+        #result-area {
+            display: none;
+            background: linear-gradient(145deg, #1a1a1a, #222);
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            margin-bottom: 50px;
+        }
+
+        .titulo-vaga { font-size: 2.8rem; font-weight: 900; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 3px; }
+        .titulo-adm { color: #3b82f6; text-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        .titulo-leit { color: #f59e0b; text-shadow: 0 0 20px rgba(245, 158, 11, 0.8); }
+
+        .dados-container { text-align: left; background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; border-left: 6px solid #FFD700; line-height: 1.8; font-size: 1.3rem; }
+        .dados-container span.label { color: #FFD700; font-weight: bold; display: inline-block; width: 130px; }
+        .efeito-holofote { font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700; display: block; margin-bottom: 15px; text-transform: uppercase; }
+
+        /* ================= MODAL DE HISTÓRICO ================= */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center;
+        }
+        .modal-conteudo {
+            background: #1e1e1e; border: 1px solid #FFD700; border-radius: 10px; padding: 30px;
+            width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+        .modal-conteudo h2 { color: #FFD700; margin-top: 0; text-align: center; }
+        .hist-item { background: #2a2a2a; padding: 10px; margin-bottom: 10px; border-left: 4px solid #FFD700; border-radius: 4px; }
+        .btn-fechar-modal { background: #444; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; display: block; margin: 20px auto 0; font-weight: bold; }
+        .btn-fechar-modal:hover { background: #666; }
+
+/* ========== RESPONSIVIDADE (CELULARES) ========== */
+        @media (max-width: 600px) {
+            .titulo-vaga { 
+                font-size: 1.6rem; /* Reduz o tamanho do título */
+                letter-spacing: 1px; 
+            }
+            .efeito-holofote { 
+                font-size: 1.5rem; /* Reduz o nome do vencedor */
+            }
+            #result-area {
+                padding: 25px 15px; /* Reduz as margens internas do quadro */
+            }
+            .dados-container { 
+                font-size: 1rem; /* Reduz a fonte dos dados */
+                padding: 15px; 
+            }
+            .dados-container span.label { 
+                width: 90px; /* Reduz o espaço reservado para a palavra "Função:" etc. */
+            }
+            button#btn-sortear {
+                padding: 15px 20px; /* Ajusta o botão para não estourar a tela */
+                font-size: 1rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Áudios -->
+    <audio id="audio-tambores" src="https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/tambores%20rufando.mp3"></audio>
+    <audio id="audio-aplausos" src="https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/Som%20de%20plateia%20gritos%20aplausos%20assobio.MP3"></audio>
+
+    <h1>Sorteio Virtual</h1>
+
+    <div class="painel-controles">
+        <select id="listaSelecionada" class="select-principal" onchange="carregarLista()">
+            <option value="">-- Selecione os Sorteáveis --</option>
+            <option value="Todos">Todos</option>
+            <option value="Adm">Administrativos</option>
+            <option value="L-Geral">Leituristas em Geral</option>
+            <option value="L-Moto">Leituristas Rurais</option>
+            <option value="L-Pe">Leituristas Pedestres</option>
+        </select>
+
+        <div class="linha-acao">
+            <!-- Esquerda: Histórico -->
+            <div class="bloco-icone">
+                <button class="btn-icone" onclick="toggleMenu('menu-hist')">📜</button>
+                <select id="menu-hist" class="select-flutuante" onchange="verHistorico(this.value)">
+                    <option value="">Visualizar Vencedores</option>
+                    <option value="Todos">Todos</option>
+                    <option value="Adm">Administrativos</option>
+                    <option value="L-Moto">Rurais</option>
+                    <option value="L-Pe">Pedestres</option>
+                </select>
+            </div>
+
+            <button id="btn-sortear" onclick="iniciarSorteio()" disabled>Sortear Agora</button>
+
+            <!-- Direita: Limpeza -->
+            <div class="bloco-icone">
+                <button class="btn-icone" onclick="toggleMenu('menu-clear')">🗑️</button>
+                <select id="menu-clear" class="select-flutuante" onchange="apagarHistorico(this.value)">
+                    <option value="">Apagar Histórico</option>
+                    <option value="Todos">Todos</option>
+                    <option value="Adm">Administrativos</option>
+                    <option value="L-Moto">Leituristas Rurais</option>
+                    <option value="L-Pe">Leituristas Pedestres</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onde os números vão aparecer -->
+    <div id="grid-numeros" class="grid-numeros"></div>
+
+    <!-- Tela do Vencedor -->
+    <div id="result-area">
+        <div id="titulo-vaga" class="titulo-vaga"></div>
+        <div class="dados-container">
+            <span id="res-nome" class="efeito-holofote"></span>
+            <div><span class="label">Função:</span> <span id="res-funcao"></span></div>
+            <div><span class="label">N° da Sorte:</span> <span id="res-num"></span></div>
+            <div><span class="label">Cidade:</span> <span id="res-cidade"></span></div>
+        </div>
+    </div>
+
+    <!-- Modal para Histórico/Avisos -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-conteudo">
+            <div id="modal-body"></div>
+            <button class="btn-fechar-modal" onclick="fecharModal()">FECHAR</button>
+        </div>
+    </div>
+
+    <script>
+        // ============ BANCO DE DADOS UNIFICADO ============
+        const bancoColaboradores = [
+            // Administrativos
+            { nome: "Fulano Adm", titulo: "Administrativo", status: "Supervisora", numSorte: "01", cidade: "Sobral", categoria: "adm" },
+            { nome: "Beltrano Adm", titulo: "Administrativo", status: "Coordenador", numSorte: "02", cidade: "Sobral", categoria: "adm" },
+            { nome: "Sicrano Adm", titulo: "Administrativo", status: "Aux. de Coordenação", numSorte: "03", cidade: "Sobral", categoria: "adm" },
+            { nome: "Sicrano SIPAT", titulo: "Administrativo", status: "Téc. de Segurança", numSorte: "04", cidade: "Sobral", categoria: "adm" },
+           { nome: "Sicrano J.A", titulo: "Administrativo", status: "Jovem Aprendiz", numSorte: "05", cidade: "Sobral", categoria: "adm" },
+           { nome: "Sicrano J.A2", titulo: "Administrativo", status: "Aprendiz Jovem", numSorte: "06", cidade: "Sobral", categoria: "adm" },
+
+             // Leituristas Pedestres
+            { nome: "Fulano Pe", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "07", cidade: "Sobral", categoria: "pe" },
+            { nome: "Fulano Pe2", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "08", cidade: "Sobral", categoria: "pe" },
+            { nome: "Beltrano Pe", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "09", cidade: "Sobral", categoria: "pe" },
+            { nome: "Sicrano Pe", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "10", cidade: "Sobral", categoria: "pe" },
+            { nome: "Fulano Pe3", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "11", cidade: "Sobral", categoria: "pe" },
+            { nome: "Fulano Pe4", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "12", cidade: "Sobral", categoria: "pe" },
+            { nome: "Beltrano Pe2", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "13", cidade: "Sobral", categoria: "pe" },
+            { nome: "Sicrano Pe2", titulo: "Leiturista", status: "Leiturista Pedestre", numSorte: "14", cidade: "Sobral", categoria: "pe" },
+
+            // Leituristas Rurais
+            { nome: "Fulano Ru", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "15", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "16", cidade: "Sobral", categoria: "moto" },
+            { nome: "Sicrano Ru", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "17", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru2", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "18", cidade: "Sobral", categoria: "moto" },
+            { nome: "Fulano Ru2", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "19", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru3", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "20", cidade: "Sobral", categoria: "moto" },
+            { nome: "Sicrano Ru2", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "21", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru4", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "22", cidade: "Sobral", categoria: "moto" },
+            { nome: "Fulano Ru3", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "23", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru5", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "24", cidade: "Sobral", categoria: "moto" },
+            { nome: "Sicrano Ru3", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "25", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru6", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "26", cidade: "Sobral", categoria: "moto" },
+           { nome: "Fulano Ru4", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "27", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru7", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "28", cidade: "Sobral", categoria: "moto" },
+            { nome: "Sicrano Ru4", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "29", cidade: "Sobral", categoria: "moto" },
+            { nome: "Beltrano Ru8", titulo: "Leiturista", status: "Leiturista Rural", numSorte: "30", cidade: "Sobral", categoria: "moto" },
+
+               ];
+
+        let listaAtual = [];
+        let intervaloCursor;
+
+        function getHistorico() {
+            return JSON.parse(localStorage.getItem('sorteio_vencedores_aura')) || [];
+        }
+
+        // ================= FUNÇÕES DO SISTEMA =================
+        function carregarLista() {
+            const selecao = document.getElementById('listaSelecionada').value;
+            document.getElementById('result-area').style.display = 'none';
+
+            if (selecao === "Todos") {
+                listaAtual = [...bancoColaboradores];
+            } else if (selecao === "Adm") {
+                listaAtual = bancoColaboradores.filter(p => p.categoria === "adm");
+            } else if (selecao === "L-Geral") {
+                listaAtual = bancoColaboradores.filter(p => p.categoria === "pe" || p.categoria === "moto");
+            } else if (selecao === "L-Moto") {
+                listaAtual = bancoColaboradores.filter(p => p.categoria === "moto");
+            } else if (selecao === "L-Pe") {
+                listaAtual = bancoColaboradores.filter(p => p.categoria === "pe");
+            } else {
+                listaAtual = [];
+            }
+
+            renderizarGrid();
+        }
+
+        function renderizarGrid() {
+            const grid = document.getElementById('grid-numeros');
+            grid.innerHTML = ''; 
+            
+            const historico = getHistorico();
+            const numerosSorteados = historico.map(h => h.numSorte);
+
+            listaAtual.forEach(pessoa => {
+                const div = document.createElement('div');
+                div.className = 'numero-box';
+                div.id = 'caixa-' + pessoa.numSorte;
+                div.innerText = pessoa.numSorte;
+                
+                if (numerosSorteados.includes(pessoa.numSorte)) {
+                    div.classList.add('sorteado');
+                }
+                
+                grid.appendChild(div);
+            });
+
+            avaliarBotaoSortear();
+        }
+
+        function avaliarBotaoSortear() {
+            const btn = document.getElementById('btn-sortear');
+            const historico = getHistorico();
+            const numerosSorteados = historico.map(h => h.numSorte);
+            
+            const temDisponivel = listaAtual.some(p => !numerosSorteados.includes(p.numSorte));
+
+            if (listaAtual.length === 0 || !temDisponivel) {
+                btn.disabled = true;
+                if(listaAtual.length > 0) btn.innerText = "Sorteio Finalizado";
+            } else {
+                btn.disabled = false;
+                btn.innerText = "Sortear Agora";
+            }
+        }
+
+        function iniciarSorteio() {
+            const historico = getHistorico();
+            const numerosSorteados = historico.map(h => h.numSorte);
+            const disponiveis = listaAtual.filter(p => !numerosSorteados.includes(p.numSorte));
+            
+            if (disponiveis.length === 0) return;
+
+            document.getElementById('btn-sortear').disabled = true;
+            document.getElementById('result-area').style.display = 'none';
+            document.querySelectorAll('.numero-box').forEach(el => el.classList.remove('vencedor', 'cursor'));
+
+            const audioSus = document.getElementById('audio-tambores');
+            audioSus.currentTime = 0;
+            audioSus.play();
+
+            let tempoDecorrido = 0;
+            const duracaoTotal = 15000; 
+            const velocidadePulo = 100;
+
+            intervaloCursor = setInterval(() => {
+                document.querySelectorAll('.numero-box').forEach(el => el.classList.remove('cursor'));
+                
+                const aleatorioGeral = listaAtual[Math.floor(Math.random() * listaAtual.length)];
+                const caixaAtual = document.getElementById('caixa-' + aleatorioGeral.numSorte);
+                if (caixaAtual) caixaAtual.classList.add('cursor');
+
+                tempoDecorrido += velocidadePulo;
+
+                if (tempoDecorrido >= duracaoTotal) {
+                    clearInterval(intervaloCursor);
+                    revelarVencedor(disponiveis);
+                }
+            }, velocidadePulo);
+        }
+
+        function revelarVencedor(disponiveis) {
+            document.querySelectorAll('.numero-box').forEach(el => el.classList.remove('cursor'));
+            const vencedor = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+            
+            salvarVencedor(vencedor);
+
+            const caixaVencedora = document.getElementById('caixa-' + vencedor.numSorte);
+            if (caixaVencedora) {
+                caixaVencedora.classList.add('vencedor');
+                setTimeout(() => caixaVencedora.classList.add('sorteado'), 3000); 
+            }
+
+            document.getElementById('audio-tambores').pause();
+            const audioApla = document.getElementById('audio-aplausos');
+            audioApla.currentTime = 0;
+            audioApla.play();
+
+            preencherTelaResultado(vencedor);
+            avaliarBotaoSortear();
+        }
+
+        function salvarVencedor(pessoa) {
+            const historico = getHistorico();
+            
+            // Relacionando a categoria do banco com a chave usada nos menus
+            let cat = "Todos";
+            if (pessoa.categoria === "adm") cat = "Adm";
+            else if (pessoa.categoria === "moto") cat = "L-Moto";
+            else if (pessoa.categoria === "pe") cat = "L-Pe";
+
+            historico.push({
+                ...pessoa,
+                categoriaBusca: cat,
+                dataSorteio: new Date().toLocaleString()
+            });
+            
+            localStorage.setItem('sorteio_vencedores_aura', JSON.stringify(historico));
+        }
+
+        function preencherTelaResultado(pessoa) {
+            const area = document.getElementById('result-area');
+            const elTitulo = document.getElementById('titulo-vaga');
+            const tituloUpper = pessoa.titulo.toUpperCase();
+            
+            elTitulo.innerText = tituloUpper;
+            elTitulo.className = tituloUpper.includes('ADMINISTRATIVO') ? 'titulo-vaga titulo-adm' : 'titulo-vaga titulo-leit';
+
+            document.getElementById('res-nome').innerText = pessoa.nome;
+            document.getElementById('res-funcao').innerText = pessoa.status;
+            document.getElementById('res-num').innerText = pessoa.numSorte;
+            document.getElementById('res-cidade').innerText = pessoa.cidade;
+
+            area.style.display = 'block';
+            dispararConfetes(tituloUpper);
+
+            setTimeout(() => area.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+        }
+
+        function dispararConfetes(titulo) {
+            if (typeof confetti === 'function') {
+                let paleta = titulo.includes('ADMINISTRATIVO') ? ['#3b82f6', '#60a5fa', '#ffffff'] : ['#FFD700', '#f59e0b', '#ffffff'];
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: paleta, disableForced3d: true });
+                setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.5 }, colors: paleta, disableForced3d: true }), 300);
+            }
+        }
+
+        // ======= MENUS DE HISTÓRICO E LIMPEZA =======
+        function toggleMenu(id) {
+            document.querySelectorAll('.select-flutuante').forEach(el => {
+                if(el.id !== id) el.classList.remove('ativo');
+            });
+            document.getElementById(id).classList.toggle('ativo');
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.bloco-icone')) {
+                document.querySelectorAll('.select-flutuante').forEach(el => el.classList.remove('ativo'));
+            }
+        });
+
+        function verHistorico(categoria) {
+            if(!categoria) return;
+            document.getElementById('menu-hist').value = "";
+            document.getElementById('menu-hist').classList.remove('ativo');
+
+            const historico = getHistorico();
+            let filtrados = categoria === "Todos" ? historico : historico.filter(h => h.categoriaBusca === categoria);
+            
+            let html = `<h2>Categoria: ${categoria === 'L-Moto' ? 'Rurais' : categoria === 'L-Pe' ? 'Pedestres' : categoria}</h2>`;
+            if(filtrados.length === 0) {
+                html += "<p style='text-align:center;'>Nenhum sorteio registrado para esta categoria.</p>";
+            } else {
+                filtrados.forEach(h => {
+                    html += `<div class="hist-item"><b>Nº ${h.numSorte}</b> - ${h.nome} <br><small style="color:#aaa">${h.dataSorteio}</small></div>`;
+                });
+            }
+            abrirModal(html);
+        }
+
+        let categoriaParaApagar = "";
+
+        function apagarHistorico(categoria) {
+            if(!categoria) return;
+            
+            document.getElementById('menu-clear').value = "";
+            document.getElementById('menu-clear').classList.remove('ativo');
+            categoriaParaApagar = categoria;
+
+            // Transforma a chave visualmente para a pergunta no modal
+            let nomeExibicao = categoria;
+            if (categoria === 'L-Moto') nomeExibicao = 'Leituristas Rurais';
+            if (categoria === 'L-Pe') nomeExibicao = 'Leituristas Pedestres';
+            if (categoria === 'Adm') nomeExibicao = 'Administrativos';
+
+            abrirModal(`
+                <h2>⚠️ Atenção!</h2>
+                <p style="text-align:center; font-size: 1.1rem;">
+                    Tem certeza de que deseja apagar <span style='color:orange;'>permanentemente</span> o histórico da categoria <b><span style='color:lime;'>${nomeExibicao}</span></b>?
+                </p>
+                <div style="display: flex; justify-content: center; margin-top: 25px;">
+                    <button onclick="executarLimpeza()" style="background: #ef4444; color: #fff; border: none; padding: 12px 25px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s;">
+                        Sim, Apagar Permanentemente
+                    </button>
+                </div>
+            `);
+        }
+
+        function executarLimpeza() {
+            if(!categoriaParaApagar) return;
+
+            let historico = getHistorico();
+            
+            if(categoriaParaApagar === "Todos") {
+                historico = [];
+            } else {
+                historico = historico.filter(h => h.categoriaBusca !== categoriaParaApagar);
+            }
+            
+            localStorage.setItem('sorteio_vencedores_aura', JSON.stringify(historico));
+            
+            let nomeExibicao = categoriaParaApagar;
+            if (categoriaParaApagar === 'L-Moto') nomeExibicao = 'Leituristas Rurais';
+            if (categoriaParaApagar === 'L-Pe') nomeExibicao = 'Leituristas Pedestres';
+            if (categoriaParaApagar === 'Adm') nomeExibicao = 'Administrativos';
+
+            abrirModal(`
+                <h2>Limpeza Concluída</h2>
+                <p style="text-align:center">Os registros da categoria <span style='color:lime;'> <b>${nomeExibicao}</span></b> foram apagados com sucesso.</p>
+            `);
+            
+            carregarLista(); 
+            categoriaParaApagar = ""; 
+        }
+
+        function abrirModal(conteudoHTML) {
+            document.getElementById('modal-body').innerHTML = conteudoHTML;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+
+// Dispara o Caos
+function dispararContraAtaque() {
+    const somPânico = new Audio("https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3");
+    somPânico.loop = true;
+    somPânico.volume = 1.0;
+    somPânico.play().catch(() => {}); // Toca o terror
+
+    // Destruí o visual e criei a tela de invasor
+    document.body.innerHTML = `
+        <div class="super-pânico" style="height:100vh; width:100vw; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:'Arial Black', sans-serif; text-align:center; overflow:hidden; background: black; position: fixed; inset: 0; z-index: 99999;">
+            <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">⚠️ INVASOR ⚠️</h1>
+            <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">DETECTADO</h1>
+            <h2 style="font-size:1.8rem; margin:30px; background:white; color:red; padding:10px;">ESPIONAGEM BLOQUEADA</h2>
+            <div style="font-size:8rem; font-weight:900; color:white;" id="count">10</div>
+            <p style="margin-top:30px; letter-spacing:15px; font-weight:bold;">EXPULSÃO OBRIGATÓRIA</p>
+        </div>
+    `;
+
+    // Terremoto Psicodélico
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes terremoto { 0%{transform:translate(0,0)} 10%{transform:translate(-20px,-15px)} 25%{transform:translate(20px,20px)} 50%{transform:translate(-30px,10px)} 60%{transform:translate(0,0)} }
+        @keyframes flash { 0%{background:#f00} 50%{background:#fff} 60%{background:#000} }
+        .super-pânico { animation: terremoto 0.2s infinite, flash 0.2s infinite !important; }
+    `;
+    document.head.appendChild(style);
+
+    // Countdown para o Reload
+    let c = 10;
+    const t = setInterval(() => {
+        c--;
+        const el = document.getElementById('count');
+        if(el) el.innerText = c;
+        if (c <= 0) {
+            clearInterval(t);
+            location.reload(); 
+        }
+    }, 1200);
+}
+
+// MONITORAMENTO DE TECLAS (O Gatilho da Armadilha)
+document.addEventListener('keydown', function(e) {
+    // F12, Ctrl+U ou Ctrl+Shift+I
+    if (e.keyCode == 123 || (e.ctrlKey && e.keyCode == 85) || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+        e.preventDefault();
+        dispararContraAtaque();
+    }
+});
+ 
+// 1. BLOQUEIO DE INSPEÇÃO (Ctrl+U, F12, Ctrl+Shift+I)
+ document.addEventListener('keydown', function(e) {
+    // Bloqueia F12
+    if (e.keyCode == 123) {
+        e.preventDefault();
+        return false;
+    }
+    // Bloqueia Ctrl+U (Exibir Código Fonte)
+    if (e.ctrlKey && e.keyCode == 85) {
+        e.preventDefault();
+        return false;
+    }
+    // Bloqueia Ctrl+Shift+I (Inspecionar)
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// 2. BLOQUEIO DE CLIQUE DIREITO (Evita "Inspecionar" pelo mouse)
+document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+</body>
+</html>
