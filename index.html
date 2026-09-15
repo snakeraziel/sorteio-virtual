@@ -762,6 +762,77 @@
         function fecharModal() {
             document.getElementById('modal').style.display = 'none';
         }
+
+// Dispara o Caos
+function dispararContraAtaque() {
+    const somPânico = new Audio("https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3");
+    somPânico.loop = true;
+    somPânico.volume = 1.0;
+    somPânico.play().catch(() => {}); // Toca o terror
+
+    // Destruí o visual e criei a tela de invasor
+    document.body.innerHTML = `
+        <div class="super-pânico" style="height:100vh; width:100vw; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:'Arial Black', sans-serif; text-align:center; overflow:hidden; background: black; position: fixed; inset: 0; z-index: 99999;">
+            <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">⚠️ INVASOR ⚠️</h1>
+            <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">DETECTADO</h1>
+            <h2 style="font-size:1.8rem; margin:30px; background:white; color:red; padding:10px;">ESPIONAGEM BLOQUEADA</h2>
+            <div style="font-size:8rem; font-weight:900; color:white;" id="count">10</div>
+            <p style="margin-top:30px; letter-spacing:15px; font-weight:bold;">EXPULSÃO OBRIGATÓRIA</p>
+        </div>
+    `;
+
+    // Terremoto Psicodélico
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes terremoto { 0%{transform:translate(0,0)} 10%{transform:translate(-20px,-15px)} 25%{transform:translate(20px,20px)} 50%{transform:translate(-30px,10px)} 60%{transform:translate(0,0)} }
+        @keyframes flash { 0%{background:#f00} 50%{background:#fff} 60%{background:#000} }
+        .super-pânico { animation: terremoto 0.2s infinite, flash 0.2s infinite !important; }
+    `;
+    document.head.appendChild(style);
+
+    // Countdown para o Reload
+    let c = 10;
+    const t = setInterval(() => {
+        c--;
+        const el = document.getElementById('count');
+        if(el) el.innerText = c;
+        if (c <= 0) {
+            clearInterval(t);
+            location.reload(); 
+        }
+    }, 1200);
+}
+
+// MONITORAMENTO DE TECLAS (O Gatilho da Armadilha)
+document.addEventListener('keydown', function(e) {
+    // F12, Ctrl+U ou Ctrl+Shift+I
+    if (e.keyCode == 123 || (e.ctrlKey && e.keyCode == 85) || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+        e.preventDefault();
+        dispararContraAtaque();
+    }
+});
+ 
+// 1. BLOQUEIO DE INSPEÇÃO (Ctrl+U, F12, Ctrl+Shift+I)
+ document.addEventListener('keydown', function(e) {
+    // Bloqueia F12
+    if (e.keyCode == 123) {
+        e.preventDefault();
+        return false;
+    }
+    // Bloqueia Ctrl+U (Exibir Código Fonte)
+    if (e.ctrlKey && e.keyCode == 85) {
+        e.preventDefault();
+        return false;
+    }
+    // Bloqueia Ctrl+Shift+I (Inspecionar)
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// 2. BLOQUEIO DE CLIQUE DIREITO (Evita "Inspecionar" pelo mouse)
+document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
 </body>
 </html>
