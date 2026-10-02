@@ -229,7 +229,7 @@
             <div class="champanhe-wrapper" onclick="abrirTelaPremios()">
                 <div class="trofeu-gigante">🏆</div>
                 <div class="champanhe-colocacao">PARABÉNS!</div>
-                <div class="clique-aqui-trofeu">Clique para sortear o prêmio!</div>
+<!--                <div class="clique-aqui-trofeu">Clique para sortear o prêmio!</div> -->
             </div>
 
             <div class="dados-container">
@@ -333,56 +333,59 @@
 
  // ============ BANCO DE PREMIAÇÕES (Local) ============
         const bancoPremiacoes = [
-            {topo: "INCRÍVEL!", frase: "Você acaba de ganhar", numPremio: "01", premio: "01 TV de 36 polegadas", relevancia: "dourado" },
-            {topo: "PARABÉNS!", frase: "Você acaba de ganhar um", numPremio: "02", premio: "PIX 250,00", relevancia: "comum" },
+            {topo: "INCRÍVEL!", frase: "Você acaba de ganhar", numPremio: "01", premio: "01 KIT", relevancia: "dourado" },
+            {topo: "PARABÉNS!", frase: "Você acaba de ganhar um", numPremio: "02", premio: "PIX 10,00", relevancia: "comum" },
             {topo: "SHOW!", frase: "Você acaba de ganhar", numPremio: "03", premio: "01 Ventilador", relevancia: "comum" },
-            {topo: "MINHA NOSSA SENHORA!", frase: "Você acaba de ganhar", numPremio: "04", premio: "PIX 1.000,00", relevancia: "dourado" },
-            {topo: "SHOW!", frase: "Você acaba de ganhar um", numPremio: "05", premio: "PIX 100,00", relevancia: "comum" },
-          {topo: "INCRÍVEL!", frase: "Você acaba de ganhar", numPremio: "06", premio: "01 TV de 42 polegadas", relevancia: "dourado" },
+            {topo: "MINHA NOSSA SENHORA!", frase: "Você acaba de ganhar", numPremio: "04", premio: "PIX 100,00", relevancia: "dourado" },
+            {topo: "SHOW!", frase: "Você acaba de ganhar um", numPremio: "05", premio: "PIX 10,00", relevancia: "comum" },
+          {topo: "INCRÍVEL!", frase: "Você acaba de ganhar", numPremio: "06", premio: "01 Liquificador", relevancia: "dourado" },
             {topo: "PARABÉNS!", frase: "Você acaba de ganhar um", numPremio: "07", premio: "PIX 150,00", relevancia: "comum" },
-            {topo: "SHOW!", frase: "Você acaba de ganhar", numPremio: "08", premio: "01 Liquidificador", relevancia: "comum" },
-            {topo: "MINHA NOSSA SENHORA!", frase: "Você acaba de ganhar", numPremio: "09", premio: "PIX 1.500,00", relevancia: "dourado" },
-            {topo: "SHOW!", frase: "Você acaba de ganhar um", numPremio: "10", premio: "PIX 150,00", relevancia: "comum" },
+            {topo: "SHOW!", frase: "Você acaba de ganhar um", numPremio: "08", premio: "PIX 25,00", relevancia: "comum" },
+            {topo: "MINHA NOSSA SENHORA!", frase: "Você acaba de ganhar um", numPremio: "09", premio: "01 KIT", relevancia: "dourado" },
+            {topo: "SHOW!", frase: "Você acaba de ganhar um", numPremio: "10", premio: "PIX 50,00", relevancia: "comum" },
         ];
 
 
         // ============ BANCO DE DADOS ENXUTO ============
         const bancoColaboradores = [
             // Administrativos
-            { nome: "Fulano Adm", status: "Supervisora", numSorte: "01", cidade: "Sobral", categoria: "adm" },
-            { nome: "Beltrano Adm", status: "Coordenador", numSorte: "02", cidade: "Sobral", categoria: "adm" },
-            { nome: "Sicrano Adm", status: "Aux. de Coordenação", numSorte: "03", cidade: "Sobral", categoria: "adm" },
-            { nome: "Sicrano SIPAT", status: "Téc. de Segurança", numSorte: "04", cidade: "Sobral", categoria: "adm" },
-            { nome: "Sicrano J.A", status: "Jovem Aprendiz", numSorte: "05", cidade: "Sobral", categoria: "adm" },
-            { nome: "Sicrano J.A2", status: "Aprendiz Jovem", numSorte: "06", cidade: "Sobral", categoria: "adm" },
+            { nome: "GLEYCIANA PEREIRA ANTUNES", status: "Supervisora", numSorte: "01", cidade: "Sobral", categoria: "adm" },
+            { nome: "ERIC WILLIAM VITORINO DE SOUSA", status: "Coordenador", numSorte: "02", cidade: "Sobral", categoria: "adm" },
+            { nome: "MARIA DO SOCORRO FONTELE", status: "Aux. de Coordenação", numSorte: "03", cidade: "Sobral", categoria: "adm" },
+            { nome: "GILMARA MIRANDA", status: "Téc. de Segurança", numSorte: "04", cidade: "Sobral", categoria: "adm" },
+            { nome: "RUAN", status: "Jovem Aprendiz", numSorte: "05", cidade: "Sobral", categoria: "adm" },
+            { nome: "FELIPE", status: "Aprendiz Jovem", numSorte: "06", cidade: "Sobral", categoria: "adm" },
 
             // Leituristas Pedestres
-            { nome: "Fulano Pe", status: "Leiturista Pedestre", numSorte: "07", cidade: "Sobral", categoria: "pe" },
-            { nome: "Fulano Pe2", status: "Leiturista Pedestre", numSorte: "08", cidade: "Sobral", categoria: "pe" },
-            { nome: "Beltrano Pe", status: "Leiturista Pedestre", numSorte: "09", cidade: "Sobral", categoria: "pe" },
-            { nome: "Sicrano Pe", status: "Leiturista Pedestre", numSorte: "10", cidade: "Sobral", categoria: "pe" },
-            { nome: "Fulano Pe3", status: "Leiturista Pedestre", numSorte: "11", cidade: "Sobral", categoria: "pe" },
-            { nome: "Fulano Pe4", status: "Leiturista Pedestre", numSorte: "12", cidade: "Sobral", categoria: "pe" },
-            { nome: "Beltrano Pe2", status: "Leiturista Pedestre", numSorte: "13", cidade: "Sobral", categoria: "pe" },
-            { nome: "Sicrano Pe2", status: "Leiturista Pedestre", numSorte: "14", cidade: "Sobral", categoria: "pe" },
+            { nome: "RAIMUNDO NONATO ROMAO SILVA", status: "Leiturista Pedestre", numSorte: "07", cidade: "Sobral", categoria: "pe" },
+            { nome: "MARIO ANDERSON ARAUJO PONTES", status: "Leiturista Pedestre", numSorte: "08", cidade: "Sobral", categoria: "pe" },
+            { nome: "MOESIO SOARES MARTINS", status: "Leiturista Pedestre", numSorte: "09", cidade: "Sobral", categoria: "pe" },
+            { nome: "MARCIO FLAVIO FERREIRA LINHARES", status: "Leiturista Pedestre", numSorte: "10", cidade: "Sobral", categoria: "pe" },
+            { nome: "JOSE ENODES DA SILVA FILHO", status: "Leiturista Pedestre", numSorte: "11", cidade: "Sobral", categoria: "pe" },
+            { nome: "JOAO ELCIO ARAUJO DO NASCIMENTO", status: "Leiturista Pedestre", numSorte: "12", cidade: "Sobral", categoria: "pe" },
+            { nome: "FRANCISCO ENEAS DO NASCIMENTO SANTOS", status: "Leiturista Pedestre", numSorte: "13", cidade: "Sobral", categoria: "pe" },
+           { nome: "EVERALDO NASCIMENTO CUNHA", status: "Leiturista Pedestre", numSorte: "14", cidade: "Sobral", categoria: "pe" },
 
             // Leituristas Rurais
-            { nome: "Fulano Ru", status: "Leiturista Rural", numSorte: "15", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru", status: "Leiturista Rural", numSorte: "16", cidade: "Sobral", categoria: "moto" },
-            { nome: "Sicrano Ru", status: "Leiturista Rural", numSorte: "17", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru2", status: "Leiturista Rural", numSorte: "18", cidade: "Sobral", categoria: "moto" },
-            { nome: "Fulano Ru2", status: "Leiturista Rural", numSorte: "19", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru3", status: "Leiturista Rural", numSorte: "20", cidade: "Sobral", categoria: "moto" },
-            { nome: "Sicrano Ru2", status: "Leiturista Rural", numSorte: "21", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru4", status: "Leiturista Rural", numSorte: "22", cidade: "Sobral", categoria: "moto" },
-            { nome: "Fulano Ru3", status: "Leiturista Rural", numSorte: "23", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru5", status: "Leiturista Rural", numSorte: "24", cidade: "Sobral", categoria: "moto" },
-            { nome: "Sicrano Ru3", status: "Leiturista Rural", numSorte: "25", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru6", status: "Leiturista Rural", numSorte: "26", cidade: "Sobral", categoria: "moto" },
-            { nome: "Fulano Ru4", status: "Leiturista Rural", numSorte: "27", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru7", status: "Leiturista Rural", numSorte: "28", cidade: "Sobral", categoria: "moto" },
-            { nome: "Sicrano Ru4", status: "Leiturista Rural", numSorte: "29", cidade: "Sobral", categoria: "moto" },
-            { nome: "Beltrano Ru8", status: "Leiturista Rural", numSorte: "30", cidade: "Sobral", categoria: "moto" }
+            { nome: "ANTONIO ATILA TEIXEIRA LINO", status: "Leiturista Rural", numSorte: "15", cidade: "Sobral", categoria: "moto" },
+            { nome: "AGDO DA SILVA VIEIRA", status: "Leiturista Rural", numSorte: "16", cidade: "Sobral", categoria: "moto" },
+            { nome: "ANTONIO MARCOS DE SOUSA", status: "Leiturista Rural", numSorte: "17", cidade: "Sobral", categoria: "moto" },
+            { nome: "EDINALDO DUARTE DA COSTA", status: "Leiturista Rural", numSorte: "18", cidade: "Sobral", categoria: "moto" },
+            { nome: "EXPEDITO SHAYNY LEITE FERREIRA", status: "Leiturista Rural", numSorte: "19", cidade: "Sobral", categoria: "moto" },
+            { nome: "FLAVIO DE OLIVEIRA SANTOS", status: "Leiturista Rural", numSorte: "20", cidade: "Sobral", categoria: "moto" },
+            { nome: "FRANCISCO LEONARDO TEIXEIRA DE MARIA", status: "Leiturista Rural", numSorte: "21", cidade: "Sobral", categoria: "moto" },
+            { nome: "FRANCISCO JADILSON NASCIMENTO", status: "Leiturista Rural", numSorte: "22", cidade: "Sobral", categoria: "moto" },
+            { nome: "FRANCISCO DIEGO RODRIGUES DE SOUSA", status: "Leiturista Rural", numSorte: "23", cidade: "Sobral", categoria: "moto" },
+            { nome: "FRANCISCO VALDENI DOS SANTOS", status: "Leiturista Rural", numSorte: "24", cidade: "Sobral", categoria: "moto" },
+            { nome: "IZIDRO MOURA DA SILVA", status: "Leiturista Rural", numSorte: "25", cidade: "Sobral", categoria: "moto" },
+            { nome: "JOAO BATISTA ARAUJO FILHO", status: "Leiturista Rural", numSorte: "26", cidade: "Sobral", categoria: "moto" },
+            { nome: "JOAO PAULO MOURA", status: "Leiturista Rural", numSorte: "27", cidade: "Sobral", categoria: "moto" },
+            { nome: "JOSE AILTON CARVALHO GOMES DA SILVA", status: "Leiturista Rural", numSorte: "28", cidade: "Sobral", categoria: "moto" },
+            { nome: "JOSE FABIO VASCONCELOS DE SOUSA", status: "Leiturista Rural", numSorte: "29", cidade: "Sobral", categoria: "moto" },
+            { nome: "LUCAS MARQUES MOURA", status: "Leiturista Rural", numSorte: "30", cidade: "Sobral", categoria: "moto" },
+           { nome: "RAIMUNDO NONATO BARBOZA DE SOUZA", status: "Leiturista Rural", numSorte: "31", cidade: "Sobral", categoria: "moto" },
+          { nome: "ROBSON RODRIGUES DE SOUSA", status: "Leiturista Rural", numSorte: "32", cidade: "Sobral", categoria: "moto" },
+         { nome: "THIAGO DARLLEY CANDIDO DO NASCIMENTO", status: "Leiturista Rural", numSorte: "33", cidade: "Sobral", categoria: "moto" }
         ];
 
         let listaAtual = [];
